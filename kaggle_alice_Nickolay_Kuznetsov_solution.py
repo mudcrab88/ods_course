@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 from scipy.sparse import hstack
@@ -9,7 +10,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 #Author - Nickolay Kuznetsov
-
+PATH_TO_DATA = '..\input'
+AUTHOR = 'Nickolay_Kuznetsov'
 # A helper function for writing predictions to a file
 def write_to_submission_file(predicted_labels, out_file, target='target', index_label="session_id"):
     predicted_df = pd.DataFrame(predicted_labels, index = np.arange(1, predicted_labels.shape[0] + 1), columns=[target])
@@ -19,8 +21,10 @@ times = ['time%s' % i for i in range(1, 11)]
 sites = ['site%s' % i for i in range(1, 11)]
 #read csv files
 print("Read csv files...")
-train_df = pd.read_csv('../input/train_sessions.csv', index_col='session_id', parse_dates=times)
-test_df = pd.read_csv('../input/test_sessions.csv', index_col='session_id', parse_dates=times)
+path_to_train=os.path.join(PATH_TO_DATA, 'train_sessions.csv')
+path_to_test=os.path.join(PATH_TO_DATA, 'test_sessions.csv')
+train_df = pd.read_csv(path_to_train, index_col='session_id', parse_dates=times)
+test_df = pd.read_csv(path_to_test, index_col='session_id', parse_dates=times)
 train_df = train_df.sort_values(by='time1')
 train_df[sites].fillna(0).astype('int').to_csv('train_sessions_text.txt', sep=' ', index=None, header=None)
 test_df[sites].fillna(0).astype('int').to_csv('test_sessions_text.txt', sep=' ', index=None, header=None)
@@ -86,14 +90,14 @@ print("Add features...")
 X_train_mod = hstack([X_train, morning_train, day_train, evening_train, night_train, start_month_train, duration_train, online_day_train])
 X_test_mod = hstack([X_test, morning_test, day_test, evening_test, night_test, start_month_test, duration_test, online_day_test])
 
-#Performing time series cross-validation, we see an improvement in ROC AUC.
+#Performing time series cross-validation, ROC AUC.
 print("Cross-validation...")
-cv_scores = cross_val_score(logit, X_train_mod, y_train, cv=time_split, scoring='roc_auc', n_jobs=-1) 
+cv_scores = cross_val_score(logit, X_train_mod, y_train, cv=time_split, scoring='roc_auc', n_jobs=1) 
 #training
 print("Training...")
 logit.fit(X_train_mod, y_train)
-#training
+#predicting
 print("Predicting...")
 logit_test_pred2 = logit.predict_proba(X_test_mod)[:, 1]
 print("Write to file...")
-write_to_submission_file(logit_test_pred2, 'submission_alice_Nickolay_Kuznetsov.csv') # 0.95469
+write_to_submission_file(logit_test_pred2, 'submission_alice_'+AUTHOR+'.csv') # 0.95482
