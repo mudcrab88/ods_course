@@ -39,6 +39,10 @@ day_ohe_feat_test = ohe.fit_transform(test_df['DayOfWeek'].values.reshape(-1,1))
 day_df_test = pd.DataFrame(day_ohe_feat_test,columns=["day="+str(i) for i in range(day_ohe_feat_test.shape[1])])
 test_df = pd.concat([test_df, day_df_test], axis=1)
 
+ohe = OneHotEncoder(sparse = True)
+od_ohe_feat_train = ohe.fit_transform(train_df['DayOfWeek'].values.reshape(-1,1))
+
+
 print(train_df.columns.values.tolist())
 columns = test_df.columns.values.tolist()
 columns.remove('Month')
