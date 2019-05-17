@@ -5,3 +5,5 @@ medium
 movie_reviews_train.csv.zip
 flight
 dota2
+submissions_data_train.csv
+event_data_train.csv
