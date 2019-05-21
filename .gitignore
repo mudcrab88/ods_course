@@ -7,3 +7,5 @@ flight
 dota2
 submissions_data_train.csv
 event_data_train.csv
+submissions_data_test.csv
+event_data_test.csv
